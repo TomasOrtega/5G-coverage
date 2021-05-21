@@ -48,4 +48,4 @@ hold off;
 
 %% save plot
 
-% exportgraphics(fig,'computational_time_with_lambda.pdf','ContentType','vector')
+exportgraphics(fig,'estimator_precision_with_lambda.pdf','ContentType','vector')
