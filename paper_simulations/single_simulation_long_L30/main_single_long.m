@@ -10,19 +10,20 @@ set(groot, 'defaultLegendInterpreter', 'latex');
 % mex -v COPTIMFLAGS='-O3 -fwrapv -DNDEBUG'  probability_OK_cpp.cpp
 
 %% Simulation Parameters
-R = 150; % Cell radius
 
-[lambda, Lmax, buildings] = chicago_buildings(R);
+rng(2); % random seed set
+
+% PPP parameter
+Lmax = 30; % Building's length distribution parameter (L ~ U(0,Lmax))
+R = 150; % Cell radius
+lambda = 0.0015;
 
 % Workspace: [-L,L]x[-L,L] square (L = 2*R); cell of study: disk of radius R centered at origin.
 L = 2 * R;
-total_shadow = generate_shadows(R, buildings); % Generation of shadow polygons in the cell
 
 N_data_vector = 5:5:60;
 
-N_montecarlo = 10000; % Number of montecarlo simulations for scenario
-
-rng(2); % random seed set
+N_montecarlo = 1000; % Number of montecarlo simulations for scenario
 
 %% Simulation
 
@@ -45,9 +46,17 @@ for k = 1:length(N_data_vector) % Loop over values to simulate
 
     N_data = N_data_vector(k);
     disp(N_data);
+    disp('Hours spent:')
+    disp(toc(timer_montecarlo) / 3600)
 
     for simulation = 1:N_montecarlo
         %% PPP-simulation of buildings and data generation.
+
+        % Mx4 matrix of buildings
+        buildings = PPP_buildings(lambda, Lmax, R);
+
+        % Generation of shadow polygons in the cell
+        total_shadow = generate_shadows(R, buildings);
 
         % Generates N data points inside the study cell with
         % light(1)/shadow(0) label.
@@ -71,7 +80,6 @@ for k = 1:length(N_data_vector) % Loop over values to simulate
         time_kNN(k) = time_kNN(k) + toc(timer);
         precision = estimation_precision(mesh, estimated_kNN, total_shadow);
         precision_kNN(k) = precision_kNN(k) + precision;
-
     end
 
 end
@@ -92,24 +100,24 @@ fig1 = figure(); hold on;
 grid on;
 
 plot(N_data_vector, precision_kNMAP, '-bo');
-plot(N_data_vector, precision_kNS, '--gs');
 plot(N_data_vector, precision_kNN, '-.md');
+plot(N_data_vector, precision_kNS, '--gs');
 
 ylim([0, 1]);
 
 % title('MAP Estimator vs. K-Nearest MAP Approximation Precision')
 ylabel('Estimator Precision')
 xlabel('$N$ data points')
-legend('$k$N-MAP', '$k$NS', '$k$NN')
+legend('$\rho$ $k$N-MAP', '$\rho$ $k$NS', '$\rho$ $k$NN')
 legend('Location', 'southeast')
 hold off;
-exportgraphics(fig1, 'estimator_precision_chicago.pdf', 'ContentType', 'vector')
+exportgraphics(fig1, 'estimator_precision.pdf', 'ContentType', 'vector')
 
 % Computation Time Plot
 fig2 = figure(); hold on;
 plot(N_data_vector, time_kNMAP, '-bo');
-plot(N_data_vector, time_kNS, '--gs');
 plot(N_data_vector, time_kNN, '-.md');
+plot(N_data_vector, time_kNS, '--gs');
 
 ylabel('Estimator Computational Time (s)')
 xlabel('$N$ data points')
@@ -117,7 +125,7 @@ legend('$k$N-MAP', '$k$NS', '$k$NN')
 legend('Location', 'east')
 
 grid on;
-exportgraphics(fig2, 'computational_time_chicago.pdf', 'ContentType', 'vector')
+exportgraphics(fig2, 'computational_time.pdf', 'ContentType', 'vector')
 
 %% Save results
-save('single_simulation_chicago')
+save('single_simulation_long')
