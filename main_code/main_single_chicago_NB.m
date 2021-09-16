@@ -20,15 +20,15 @@ total_shadow = generate_shadows(R, buildings); % Generation of shadow polygons i
 
 N_data_vector = 5:5:60;
 
-N_montecarlo = 10000; % Number of montecarlo simulations for scenario
+N_montecarlo = 1000; % Number of montecarlo simulations for scenario
 
 rng(2); % random seed set
 
 %% Simulation
 
 % Precision variables init
-precision_ML = zeros(1, length(N_data_vector));
-time_ML = zeros(1, length(N_data_vector));
+precision_NB = zeros(1, length(N_data_vector));
+time_NB = zeros(1, length(N_data_vector));
 
 N_mesh = 12; % Mesh x,y partitions.
 [x, y] = meshgrid(linspace(-R, R, N_mesh), linspace(-R, R, N_mesh));
@@ -51,10 +51,10 @@ for k = 1:length(N_data_vector) % Loop over values to simulate
 
         %% Estimation of light/shadow in the cell mesh and calculus of precision.
         timer = tic;
-        estimated_ML = ML_estimator(data, lambda, Lmax, mesh);
-        time_ML(k) = time_ML(k) + toc(timer);
-        precision = estimation_precision(mesh, estimated_ML, total_shadow);
-        precision_ML(k) = precision_ML(k) + precision;
+        estimated_NB = NB_estimator(data, lambda, Lmax, mesh);
+        time_NB(k) = time_NB(k) + toc(timer);
+        precision = estimation_precision(mesh, estimated_NB, total_shadow);
+        precision_NB(k) = precision_NB(k) + precision;
 
     end
 
@@ -64,14 +64,14 @@ disp('Timer Montecarlo took')
 disp(toc(timer_montecarlo))
 
 %Normalize precision values
-precision_ML = precision_ML / N_montecarlo;
-time_ML = time_ML / N_montecarlo;
+precision_NB = precision_NB / N_montecarlo;
+time_NB = time_NB / N_montecarlo;
 
 %% Plot results.
 hold on;
 grid on;
 
-plot(N_data_vector, precision_ML, '--k*', 'DisplayName', 'ML');
+plot(N_data_vector, precision_NB, '--k*', 'DisplayName', 'NB');
 
 ylim([0, 1]);
 
