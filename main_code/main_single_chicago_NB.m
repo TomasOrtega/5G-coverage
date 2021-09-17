@@ -21,6 +21,7 @@ total_shadow = generate_shadows(R, buildings); % Generation of shadow polygons i
 N_data_vector = 5:5:60;
 
 N_montecarlo = 1000; % Number of montecarlo simulations for scenario
+% will take 15h
 
 rng(2); % random seed set
 
@@ -67,11 +68,13 @@ disp(toc(timer_montecarlo))
 precision_NB = precision_NB / N_montecarlo;
 time_NB = time_NB / N_montecarlo;
 
+save('NB_chicago.mat')
+
 %% Plot results.
 hold on;
 grid on;
 
-plot(N_data_vector, precision_NB, '--k*', 'DisplayName', 'NB');
+plot(N_data_vector, precision_NB, '--g*', 'DisplayName', 'NB');
 
 ylim([0, 1]);
 
