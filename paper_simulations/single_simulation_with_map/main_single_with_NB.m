@@ -10,11 +10,11 @@ set(groot, 'defaultLegendInterpreter','latex');
 % mex -v COPTIMFLAGS='-O3 -fwrapv -DNDEBUG'  probability_OK_cpp.cpp
 
 %% Simulation Parameters
-load('single_simulation_with_NB.mat');
+load('single_simulation_with_map.mat');
 rng(2); % random seed set
 
 % TODO delete this, just to test
-N_montecarlo = 1;  % Number of montecarlo simulations for scenario
+N_montecarlo = 10;  % Number of montecarlo simulations for scenario
 
 %% Simulation
 
@@ -71,28 +71,21 @@ time_Gaussian = time_Gaussian/N_montecarlo;
 
 
 %% Plot results.
-fig1 = gcf; hold on;
-plot(N_data_vector, precision_Gaussian,'-.md', 'DisplayName', 'Gaussian');
-plot(N_data_vector, precision_NB,'--gs', 'NB');
-hold off;
-exportgraphics(fig1,'estimator_precision_v2.pdf','ContentType','vector')
-
 % Computation Time Plot
-fig2 = figure(); hold on;
-plot(N_data_vector, time_kNMAP,'-bo');
-plot(N_data_vector, time_kNN,'-.md');
-plot(N_data_vector, time_kNS,'--gs');
-plot(N_data_vector, time_MAP,':kx');
+hold on;
 plot(N_data_vector, time_NB,'--gs');
 plot(N_data_vector, time_Gaussian,':kx');
-
-ylabel('Estimator Computational Time (s)')
-xlabel('$N$ data points')
 legend('$k$N-MAP', '$k$NN','$k$NS', 'MAP', 'NB', 'Gaussian')
 legend('Location', 'east')
-
-grid on;
 exportgraphics(fig2,'computational_time_v2.pdf','ContentType','vector')
+hold off;
+close;
+
+hold on;
+plot(N_data_vector, precision_Gaussian,'-.md', 'DisplayName', 'Gaussian');
+plot(N_data_vector, precision_NB,'--gs', 'DisplayName', 'NB');
+hold off;
+exportgraphics(fig1,'estimator_precision_v2.pdf','ContentType','vector')
 
 %% Save results
 save('single_simulation_with_NB')
