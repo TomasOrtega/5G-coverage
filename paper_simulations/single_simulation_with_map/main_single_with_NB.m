@@ -13,9 +13,6 @@ set(groot, 'defaultLegendInterpreter','latex');
 load('single_simulation_with_map.mat');
 rng(2); % random seed set
 
-% TODO delete this, just to test
-N_montecarlo = 10;  % Number of montecarlo simulations for scenario
-
 %% Simulation
 
 % Precision variables init
